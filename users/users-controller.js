@@ -65,6 +65,12 @@ const UsersController = (app) => {
     res.json(isSongLiked);
   }
 
+  const findWhoRecentlyLiked = async (req, res) => {
+    const songID = req.params.songID;
+    const whoRecentlyLiked = await usersDao.findUsersByLikedSong(songID);
+    res.json(whoRecentlyLiked);
+  }
+
   app.get('/users', findAllUsers)
   app.get('/users/:uid', findUserById)
   app.post('/users', createUser)
@@ -75,6 +81,7 @@ const UsersController = (app) => {
   app.post('/profile', profile)
 
   app.put('/likeSong', toggleSongLike)
+  app.get('/recentlyLikedBy/:songID', findWhoRecentlyLiked)
 }
 
 export default UsersController;

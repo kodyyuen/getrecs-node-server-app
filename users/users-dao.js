@@ -15,6 +15,12 @@ export const findUserByCredentials = async (username, password) =>
 export const findAllUsers = async () =>
   await usersModel.find()
 
+export const findUsersByLikedSong = async (songID) =>
+  await usersModel.find({ likes: songID }, { 
+    password: false, 
+    likes: false 
+  })
+
 export const deleteUser = async (uid) =>
   await usersModel.deleteOne({ _id: uid })
 
