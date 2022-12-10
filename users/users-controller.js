@@ -8,7 +8,7 @@ const UsersController = (app) => {
 
   const findUserById = async (req, res) => {
     const uid = req.params.uid
-    const user = await userDao.findUserById(uid)
+    const user = await usersDao.findUserById(uid)
     if (user) {
       res.json(user)
       return
@@ -59,7 +59,8 @@ const UsersController = (app) => {
   }
 
   const toggleSongLike = async (req, res) => {
-    const { uid, songIds } = req.body;
+    const { songIds } = req.body;
+    const uid = req.session['currentUser']._id;
     const isSongLiked = await usersDao.updateUser(uid, {likes: songIds});
     res.json(isSongLiked);
   }
