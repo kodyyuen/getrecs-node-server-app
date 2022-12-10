@@ -52,17 +52,21 @@ const UsersController = (app) => {
 
   const profile = (req, res) => {
     if (req.session['currentUser']) {
-      res.send(req.session['currentUser'])
+      res.json(req.session['currentUser'])
     } else {
       res.sendStatus(403)
     }
   }
 
-  const toggleSongLike = async (req, res) => {
-    const { songIds } = req.body;
-    const uid = req.session['currentUser']._id;
-    const isSongLiked = await usersDao.updateUser(uid, {likes: songIds});
-    res.json(isSongLiked);
+  const updateUser = async (req, res) => {
+    const updates = req.body;
+    if (req.session['currentUser']) {
+        const uid = req.session['currentUser']._id;
+        const update = await usersDao.updateUser(uid, updates);
+        res.json(update);
+        return;
+    }
+    res.sendStatus(403);
   }
 
   const findWhoRecentlyLiked = async (req, res) => {
@@ -74,13 +78,13 @@ const UsersController = (app) => {
   app.get('/users', findAllUsers)
   app.get('/users/:uid', findUserById)
   app.post('/users', createUser)
+  app.put('/users/update', updateUser)
 
   app.post('/register', register)
   app.post('/login', login)
   app.post('/logout', logout)
   app.post('/profile', profile)
 
-  app.put('/likeSong', toggleSongLike)
   app.get('/recentlyLikedBy/:songID', findWhoRecentlyLiked)
 }
 
