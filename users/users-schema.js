@@ -6,6 +6,7 @@ const usersSchema = mongoose.Schema({
   name: {type: String, default: ""},
   role: { type: String, enum: ["CONNECTED", "UNCONNECTED"] },
   likes: { type: Array, default: [] },
+  recommendations: { type: Array, default: [] },
 }, { collection: "users" })
 
 export default usersSchema;
