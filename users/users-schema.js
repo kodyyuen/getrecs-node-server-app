@@ -7,6 +7,7 @@ const usersSchema = mongoose.Schema({
   role: { type: String, enum: ["USER", "ADMIN"], default: "USER" },
   likes: { type: Array, default: [] },
   recommendations: { type: Array, default: [] },
+  likesData: {type: Array, default: [] }
 }, { collection: "users" })
 
 export default usersSchema;
