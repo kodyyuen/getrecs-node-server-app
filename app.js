@@ -3,6 +3,7 @@ import cors from "cors";
 import session from "express-session";
 import mongoose from "mongoose";
 import UsersController from "./users/users-controller.js";
+import SongsController from "./songs/songs-controller.js";
 
 mongoose.connect('mongodb://localhost:27017/getrecs')
 
@@ -21,5 +22,6 @@ app.use(session({
 app.use(express.json())
 
 UsersController(app)
+SongsController(app)
 
 app.listen(4000)

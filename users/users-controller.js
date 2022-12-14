@@ -75,6 +75,18 @@ const UsersController = (app) => {
     await usersDao.deleteUser(uid);
     res.sendStatus(200);
   }
+  
+  const appendToUserField = async (req, res) => {
+    const updates = req.body;
+    if (req.session['currentUser']) {
+        const uid = req.session['currentUser']._id;
+        const update = await usersDao.appendToUserField(uid, updates);
+        req.session['currentUser'] = update;
+        res.json(update);
+        return;
+    }
+    res.sendStatus(403);
+  }
 
   const findWhoRecentlyLiked = async (req, res) => {
     const songID = req.params.songID;
@@ -87,6 +99,7 @@ const UsersController = (app) => {
   app.post('/users', createUser)
   app.put('/users/update', updateUser)
   app.delete('/users/deleteUser/:uid', deleteUser)
+  app.put('/users/appendToField', appendToUserField)
 
   app.post('/register', register)
   app.post('/login', login)
