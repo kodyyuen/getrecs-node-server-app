@@ -6,8 +6,8 @@ export const createUser = async (user) =>
 export const findUserByUsername = async (username) =>
   await usersModel.findOne({ username })
 
-export const findUserById = (uid) =>
-  usersModel.findById(uid, { password: false })
+export const findUserById = async (uid) =>
+  await usersModel.findById(uid, { password: false })
 
 export const findUserByCredentials = async (username, password) =>
   await usersModel.findOne({ username, password })
@@ -26,3 +26,8 @@ export const deleteUser = async (uid) =>
 
 export const updateUser = async (uid, userUpdates) =>
   await usersModel.findByIdAndUpdate({ _id: uid }, { $set: userUpdates }, {new: true})
+
+export const appendToUserField = async (uid, updates) => 
+  await usersModel.findByIdAndUpdate({ _id: uid }, {
+    $push: updates
+  }, {new: true})

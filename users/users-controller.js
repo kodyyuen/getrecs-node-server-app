@@ -70,6 +70,18 @@ const UsersController = (app) => {
     res.sendStatus(403);
   }
 
+  const appendToUserField = async (req, res) => {
+    const updates = req.body;
+    if (req.session['currentUser']) {
+        const uid = req.session['currentUser']._id;
+        const update = await usersDao.appendToUserField(uid, updates);
+        req.session['currentUser'] = update;
+        res.json(update);
+        return;
+    }
+    res.sendStatus(403);
+  }
+
   const getCurrentUser = async (req, res) => {
     if (req.session['currentUser']) {
         const uid = req.session['currentUser']._id;
@@ -90,6 +102,7 @@ const UsersController = (app) => {
   app.get('/users/:uid', findUserById)
   app.post('/users', createUser)
   app.put('/users/update', updateUser)
+  app.put('/users/appendToField', appendToUserField)
 
   app.post('/register', register)
   app.post('/login', login)
