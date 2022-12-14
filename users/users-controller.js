@@ -2,7 +2,7 @@ import * as usersDao from "./users-dao.js";
 
 const UsersController = (app) => {
   const findAllUsers = async (req, res) => {
-    const users = usersDao.findAllUsers()
+    const users = await usersDao.findAllUsers()
     res.json(users)
   }
 
@@ -70,14 +70,10 @@ const UsersController = (app) => {
     res.sendStatus(403);
   }
 
-  const getCurrentUser = async (req, res) => {
-    if (req.session['currentUser']) {
-        const uid = req.session['currentUser']._id;
-        const update = await usersDao.updateUser(uid, updates);
-        res.json(update);
-        return;
-    }
-    res.sendStatus(403);
+  const deleteUser = async (req, res) => {
+    const uid = req.params.uid;
+    await usersDao.deleteUser(uid);
+    res.sendStatus(200);
   }
 
   const findWhoRecentlyLiked = async (req, res) => {
@@ -90,6 +86,7 @@ const UsersController = (app) => {
   app.get('/users/:uid', findUserById)
   app.post('/users', createUser)
   app.put('/users/update', updateUser)
+  app.delete('/users/deleteUser/:uid', deleteUser)
 
   app.post('/register', register)
   app.post('/login', login)
