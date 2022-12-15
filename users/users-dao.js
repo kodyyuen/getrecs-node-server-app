@@ -31,3 +31,14 @@ export const appendToUserField = async (uid, updates) =>
   await usersModel.findByIdAndUpdate({ _id: uid }, {
     $push: updates
   }, {new: true})
+
+export const removeRec = async (uid, timeStamp) => {
+  const currentRecs = await usersModel.findById(uid);
+  const newRecs = currentRecs.recommendations.filter(rec => rec.timeStamp !== timeStamp);
+  const updatedUser = await usersModel.findByIdAndUpdate(
+    { _id: uid }, 
+    { $set: { recommendations: newRecs } }, 
+    {new: true}
+  );
+  return updatedUser;
+}

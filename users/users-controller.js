@@ -94,12 +94,25 @@ const UsersController = (app) => {
     res.json(whoRecentlyLiked);
   }
 
+  const removeRec = async (req, res) => {
+    const timeStamp = req.body.timeStamp;
+    if (req.session['currentUser']) {
+        const uid = req.session['currentUser']._id;
+        const update = await usersDao.removeRec(uid, timeStamp);
+        req.session['currentUser'] = update;
+        res.json(update);
+        return;
+    }
+    res.sendStatus(403);
+  }
+
   app.get('/users', findAllUsers)
   app.get('/users/:uid', findUserById)
   app.post('/users', createUser)
   app.put('/users/update', updateUser)
   app.delete('/users/deleteUser/:uid', deleteUser)
   app.put('/users/appendToField', appendToUserField)
+  app.put('/users/removeRec', removeRec)
 
   app.post('/register', register)
   app.post('/login', login)
