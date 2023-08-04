@@ -4,6 +4,7 @@ import session from "express-session";
 import mongoose from "mongoose";
 import UsersController from "./users/users-controller.js";
 import SongsController from "./songs/songs-controller.js";
+import SpotifyController from "./spotify/spotify-controller.js";
 import 'dotenv/config';
 
 // mongoose.connect('mongodb://localhost:27017/getrecs')
@@ -26,5 +27,6 @@ app.use(express.json())
 
 UsersController(app)
 SongsController(app)
+SpotifyController(app)
 
 app.listen(4000)
