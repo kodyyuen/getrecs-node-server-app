@@ -85,56 +85,91 @@ const SpotifyController = (app) => {
 
   const getProfile = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get("https://api.spotify.com/v1/me", { headers: { "Authorization": `Bearer ${req.session.apiKey}` } })
-      console.log("response.data: " + response.data)
-      console.log("response: " + response)
+      const response = await axios.get("https://api.spotify.com/v1/me", {
+        headers: { Authorization: `Bearer ${req.session.apiKey}` },
+      });
+      console.log("response.data: " + response.data);
+      console.log("response: " + response);
       res.json(response.data);
-    }
-    else {
+    } else {
       res.sendStatus(403);
     }
   };
 
   const logout = async (req, res) => {
-    req.session.destroy()
-    res.sendStatus(200)
-  }
+    req.session.destroy();
+    res.sendStatus(200);
+  };
 
   const getShortTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=0", { headers: { "Authorization": `Bearer ${req.session.apiKey}` } })
-      console.log("response.data: " + response.data)
-      console.log("response: " + response)
+      const response = await axios.get(
+        "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=0",
+        { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+      );
+      console.log("response.data: " + response.data);
+      console.log("response: " + response);
       res.json(response.data.items);
-    }
-    else {
+    } else {
       res.sendStatus(403);
     }
-  }
+  };
 
   const getMediumTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get("https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=20&offset=0", { headers: { "Authorization": `Bearer ${req.session.apiKey}` } })
-      console.log("response.data: " + response.data)
-      console.log("response: " + response)
+      const response = await axios.get(
+        "https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=20&offset=0",
+        { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+      );
+      console.log("response.data: " + response.data);
+      console.log("response: " + response);
       res.json(response.data.items);
-    }
-    else {
+    } else {
       res.sendStatus(403);
     }
-  }
+  };
 
   const getLongTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get("https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=0", { headers: { "Authorization": `Bearer ${req.session.apiKey}` } })
-      console.log("response.data: " + response.data)
-      console.log("response: " + response)
+      const response = await axios.get(
+        "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=0",
+        { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+      );
+      console.log("response.data: " + response.data);
+      console.log("response: " + response);
       res.json(response.data.items);
-    }
-    else {
+    } else {
       res.sendStatus(403);
     }
-  }
+  };
+
+  const getSpotifyRecs = async (req, res) => {
+    if (req.session.apiKey) {
+      console.log(req.body);
+      const formattedSongList = req.body.seeds.join(",");
+      const query = {
+        seed_artists: "",
+        seed_genres: "",
+        seed_tracks: formattedSongList,
+      };
+      console.log(req.body.seeds);
+      console.log(formattedSongList);
+
+      //res.json([]);
+      const response = await axios.get(
+        "https://api.spotify.com/v1/recommendations",
+        {
+          headers: {
+            Authorization: `Bearer ${req.session.apiKey}`,
+          },
+          params: query,
+        }
+      );
+      res.json(response.data);
+    } else {
+      res.sendStatus(403);
+    }
+  };
 
   app.get("/spotify", redirectLogin);
   app.get("/spotify/callback", getApiKey);
@@ -143,6 +178,7 @@ const SpotifyController = (app) => {
   app.get("/spotify/topsongs/short", getShortTopSongs);
   app.get("/spotify/topsongs/medium", getMediumTopSongs);
   app.get("/spotify/topsongs/long", getLongTopSongs);
+  app.post("/spotify/recs", getSpotifyRecs);
 };
 
 export default SpotifyController;
