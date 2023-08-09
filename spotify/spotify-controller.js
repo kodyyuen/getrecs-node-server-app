@@ -11,12 +11,13 @@ const SpotifyController = (app) => {
       "user-top-read",
       "user-read-currently-playing",
       "user-read-playback-state",
+      "playlist-modify-private"
     ];
     const str = querystring.stringify({
       response_type: "code",
       client_id: clientId,
       scope:
-        "user-top-read user-read-currently-playing user-read-playback-state",
+        "user-top-read user-read-currently-playing user-read-playback-state playlist-modify-private",
       redirect_uri: redirectUri,
       show_dialog: "true",
     });
@@ -148,8 +149,6 @@ const SpotifyController = (app) => {
       console.log(req.body);
       const formattedSongList = req.body.seeds.join(",");
       const query = {
-        seed_artists: "",
-        seed_genres: "",
         seed_tracks: formattedSongList,
       };
       console.log(req.body.seeds);
@@ -165,7 +164,50 @@ const SpotifyController = (app) => {
           params: query,
         }
       );
-      res.json(response.data);
+      console.log("api key " + req.session.apiKey);
+      res.json(response.data.tracks);
+    } else {
+      res.sendStatus(403);
+    }
+  };
+
+  const addRecsToPlaylist = async (req, res) => {
+    if (req.session.apiKey) {
+      const { user_id, body, uris } = req.body.params;
+      console.log("user_id " + user_id);
+      console.log("body " + body);
+      console.log("uris " + uris);
+      console.log("api key " + req.session.apiKey);
+
+      const createPlaylist = await axios.post(
+        `https://api.spotify.com/v1/users/${user_id}/playlists`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${req.session.apiKey}`,
+          },
+        }
+      );
+      const { id } = createPlaylist.data;
+
+      const response = await axios.post(
+        `https://api.spotify.com/v1/playlists/${id}/tracks`,
+        uris,
+        {
+          headers: {
+            Authorization: `Bearer ${req.session.apiKey}`,
+          },
+        }
+      );
+
+      if (response.data.snapshot_id) {
+        res.sendStatus(200);
+      }
+      else {
+        res.sendStatus(403);
+      }
+
+      // res.json(response.data.tracks);
     } else {
       res.sendStatus(403);
     }
@@ -179,6 +221,7 @@ const SpotifyController = (app) => {
   app.get("/spotify/topsongs/medium", getMediumTopSongs);
   app.get("/spotify/topsongs/long", getLongTopSongs);
   app.post("/spotify/recs", getSpotifyRecs);
+  app.post("/spotify/recs/playlist", addRecsToPlaylist);
 };
 
 export default SpotifyController;
