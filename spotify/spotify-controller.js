@@ -2,60 +2,50 @@ import axios from "axios";
 import querystring from "querystring";
 
 const SpotifyController = (app) => {
+  const redirect_uri_front = "http://localhost:3000/profile";
+  const redirect_uri = "http://localhost:4000/spotify/callback";
+
+  const refreshAuthToken = async (callback, req, res) => {
+    const response = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      {
+        refresh_token: req.session.refresh_token,
+        grant_type: "refresh_token",
+      },
+      {
+        headers: {
+          Authorization:
+            "Basic " +
+            Buffer.from(
+              process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET,
+              "utf-8"
+            ).toString("base64"),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    req.session.apiKey = response.data.access_token;
+    callback(req, res);
+  };
+
   const redirectLogin = async (req, res) => {
-    const authEndpoint = "https://accounts.spotify.com/authorize";
-    const clientId = "9534d135519d4b049b481e8bc6862e40";
-    // const redirectUri = "http://localhost:3000/profile";
-    const redirectUri = "http://localhost:4000/spotify/callback";
-    const scopes = [
-      "user-top-read",
-      "user-read-currently-playing",
-      "user-read-playback-state",
-      "playlist-modify-private"
-    ];
+    const scopes = ["user-top-read", "playlist-modify-private"];
+
     const str = querystring.stringify({
       response_type: "code",
-      client_id: clientId,
-      scope:
-        "user-top-read user-read-currently-playing user-read-playback-state playlist-modify-private",
-      redirect_uri: redirectUri,
+      client_id: process.env.CLIENT_ID,
+      scope: scopes.join(" "),
+      redirect_uri: redirect_uri,
       show_dialog: "true",
     });
+
     res.redirect("https://accounts.spotify.com/authorize?" + str);
-    // res.redirect(
-    //   `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
-    //     "%20"
-    //   )}&response_type=token&show_dialog=true`
-    // );
   };
 
   const getApiKey = async (req, res) => {
     let code = req.query.code;
-    let state = req.query.state;
-    const client_id = "9534d135519d4b049b481e8bc6862e40";
-    const client_secret = "958d137cb4e44d4b9eca6ad5333bf62e";
-    const redirect_urifront = "http://localhost:3000/profile";
-    const redirect_uri = "http://localhost:4000/spotify/callback";
 
-    let authOptions = {
-      // url: "https://accounts.spotify.com/api/token",
-      // method: "POST",
-      form: {
-        code: code,
-        redirect_uri: redirect_uri,
-        grant_type: "authorization_code",
-      },
-      headers: {
-        Authorization:
-          "Basic " +
-          Buffer.from(client_id + ":" + client_secret, "utf-8").toString(
-            "base64"
-          ),
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      json: true,
-    };
-    console.log("code: " + code);
     const response = await axios.post(
       "https://accounts.spotify.com/api/token",
       {
@@ -67,30 +57,31 @@ const SpotifyController = (app) => {
         headers: {
           Authorization:
             "Basic " +
-            Buffer.from(client_id + ":" + client_secret, "utf-8").toString(
-              "base64"
-            ),
+            Buffer.from(
+              process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET,
+              "utf-8"
+            ).toString("base64"),
           "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
-
     req.session.apiKey = response.data.access_token;
-    console.log("access token: " + response.data.access_token);
-    res.redirect(redirect_urifront);
-    // axios.post(authOptions, (error, response, body) => {
-    //   console.log(body.access_token);
-    //   res.json(body.access_token);
-    // });
+    req.session.refresh_token = response.data.refresh_token;
+    res.redirect(redirect_uri_front);
   };
 
   const getProfile = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get("https://api.spotify.com/v1/me", {
-        headers: { Authorization: `Bearer ${req.session.apiKey}` },
-      });
-      console.log("response.data: " + response.data);
-      console.log("response: " + response);
+      const response = await axios
+        .get("https://api.spotify.com/v1/me", {
+          headers: { Authorization: `Bearer ${req.session.apiKey}` },
+        })
+        .catch((error) => {
+          if (error.response.status === 401) {
+            console.log(error.response);
+            refreshAuthToken(getProfile, req, res);
+          }
+        });
       res.json(response.data);
     } else {
       res.sendStatus(403);
@@ -104,12 +95,17 @@ const SpotifyController = (app) => {
 
   const getShortTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get(
-        "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=0",
-        { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
-      );
-      console.log("response.data: " + response.data);
-      console.log("response: " + response);
+      const response = await axios
+        .get(
+          "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=0",
+          { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+        )
+        .catch((error) => {
+          if (error.response.status === 401) {
+            console.log(error.response);
+            refreshAuthToken(getShortTopSongs, req, res);
+          }
+        });
       res.json(response.data.items);
     } else {
       res.sendStatus(403);
@@ -118,10 +114,17 @@ const SpotifyController = (app) => {
 
   const getMediumTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get(
-        "https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=20&offset=0",
-        { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
-      );
+      const response = await axios
+        .get(
+          "https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=20&offset=0",
+          { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+        )
+        .catch((error) => {
+          if (error.response.status === 401) {
+            console.log(error.response);
+            refreshAuthToken(getMediumTopSongs, req, res);
+          }
+        });
       console.log("response.data: " + response.data);
       console.log("response: " + response);
       res.json(response.data.items);
@@ -132,10 +135,17 @@ const SpotifyController = (app) => {
 
   const getLongTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios.get(
-        "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=0",
-        { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
-      );
+      const response = await axios
+        .get(
+          "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=0",
+          { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+        )
+        .catch((error) => {
+          if (error.response.status === 401) {
+            console.log(error.response);
+            refreshAuthToken(getLongTopSongs, req, res);
+          }
+        });
       console.log("response.data: " + response.data);
       console.log("response: " + response);
       res.json(response.data.items);
@@ -146,26 +156,23 @@ const SpotifyController = (app) => {
 
   const getSpotifyRecs = async (req, res) => {
     if (req.session.apiKey) {
-      console.log(req.body);
-      const formattedSongList = req.body.seeds.join(",");
-      const query = {
-        seed_tracks: formattedSongList,
-      };
-      console.log(req.body.seeds);
-      console.log(formattedSongList);
-
-      //res.json([]);
-      const response = await axios.get(
-        "https://api.spotify.com/v1/recommendations",
-        {
-          headers: {
-            Authorization: `Bearer ${req.session.apiKey}`,
-          },
-          params: query,
+      let response;
+      try {
+        response = await axios.get(
+          "https://api.spotify.com/v1/recommendations",
+          {
+            headers: {
+              Authorization: `Bearer ${req.session.apiKey}`,
+            },
+            params: { seed_tracks: req.body.seeds.join(",") },
+          }
+        );
+        res.json(response.data.tracks);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getSpotifyRecs, req, res);
         }
-      );
-      console.log("api key " + req.session.apiKey);
-      res.json(response.data.tracks);
+      }
     } else {
       res.sendStatus(403);
     }
@@ -174,40 +181,42 @@ const SpotifyController = (app) => {
   const addRecsToPlaylist = async (req, res) => {
     if (req.session.apiKey) {
       const { user_id, body, uris } = req.body.params;
-      console.log("user_id " + user_id);
-      console.log("body " + body);
-      console.log("uris " + uris);
-      console.log("api key " + req.session.apiKey);
 
-      const createPlaylist = await axios.post(
-        `https://api.spotify.com/v1/users/${user_id}/playlists`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${req.session.apiKey}`,
-          },
+      let playlist;
+      let response;
+      try {
+        createPlaylist = await axios.post(
+          `https://api.spotify.com/v1/users/${user_id}/playlists`,
+          body,
+          {
+            headers: {
+              Authorization: `Bearer ${req.session.apiKey}`,
+            },
+          }
+        );
+
+        const { id } = playlist.data;
+
+        response = await axios.post(
+          `https://api.spotify.com/v1/playlists/${id}/tracks`,
+          uris,
+          {
+            headers: {
+              Authorization: `Bearer ${req.session.apiKey}`,
+            },
+          }
+        );
+
+        if (response.data.snapshot_id) {
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(403);
         }
-      );
-      const { id } = createPlaylist.data;
-
-      const response = await axios.post(
-        `https://api.spotify.com/v1/playlists/${id}/tracks`,
-        uris,
-        {
-          headers: {
-            Authorization: `Bearer ${req.session.apiKey}`,
-          },
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(addRecsToPlaylist, req, res);
         }
-      );
-
-      if (response.data.snapshot_id) {
-        res.sendStatus(200);
       }
-      else {
-        res.sendStatus(403);
-      }
-
-      // res.json(response.data.tracks);
     } else {
       res.sendStatus(403);
     }
