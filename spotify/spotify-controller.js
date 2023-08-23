@@ -78,7 +78,6 @@ const SpotifyController = (app) => {
         })
         .catch((error) => {
           if (error.response.status === 401) {
-            console.log(error.response);
             refreshAuthToken(getProfile, req, res);
           }
         });
@@ -102,7 +101,6 @@ const SpotifyController = (app) => {
         )
         .catch((error) => {
           if (error.response.status === 401) {
-            console.log(error.response);
             refreshAuthToken(getShortTopSongs, req, res);
           }
         });
@@ -121,12 +119,9 @@ const SpotifyController = (app) => {
         )
         .catch((error) => {
           if (error.response.status === 401) {
-            console.log(error.response);
             refreshAuthToken(getMediumTopSongs, req, res);
           }
         });
-      console.log("response.data: " + response.data);
-      console.log("response: " + response);
       res.json(response.data.items);
     } else {
       res.sendStatus(403);
@@ -142,12 +137,9 @@ const SpotifyController = (app) => {
         )
         .catch((error) => {
           if (error.response.status === 401) {
-            console.log(error.response);
             refreshAuthToken(getLongTopSongs, req, res);
           }
         });
-      console.log("response.data: " + response.data);
-      console.log("response: " + response);
       res.json(response.data.items);
     } else {
       res.sendStatus(403);
