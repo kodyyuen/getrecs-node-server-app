@@ -185,7 +185,7 @@ const SpotifyController = (app) => {
       let playlist;
       let response;
       try {
-        createPlaylist = await axios.post(
+        playlist = await axios.post(
           `https://api.spotify.com/v1/users/${user_id}/playlists`,
           body,
           {
@@ -195,7 +195,8 @@ const SpotifyController = (app) => {
           }
         );
 
-        const { id } = playlist.data;
+        const { id, external_urls } = playlist.data;
+        const { spotify } = external_urls;
 
         response = await axios.post(
           `https://api.spotify.com/v1/playlists/${id}/tracks`,
@@ -208,7 +209,7 @@ const SpotifyController = (app) => {
         );
 
         if (response.data.snapshot_id) {
-          res.sendStatus(200);
+          res.json(spotify);
         } else {
           res.sendStatus(403);
         }
