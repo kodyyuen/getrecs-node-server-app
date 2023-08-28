@@ -5,6 +5,18 @@ const SpotifyController = (app) => {
   const redirect_uri_front = "http://localhost:3000/profile";
   const redirect_uri = "http://localhost:4000/spotify/callback";
 
+  const logout = async (req, res) => {
+    req.session.destroy();
+    res.sendStatus(200);
+  };
+
+  const checkAPIKey = async (req, res) => {
+    if (!req.session.apiKey) {
+      req.session.destroy();
+      res.sendStatus(403);
+    }
+  };
+
   const refreshAuthToken = async (callback, req, res) => {
     const response = await axios.post(
       "https://accounts.spotify.com/api/token",
@@ -81,30 +93,27 @@ const SpotifyController = (app) => {
             refreshAuthToken(getProfile, req, res);
           }
         });
+      // res.sendStatus(403);
       res.json(response.data);
     } else {
       res.sendStatus(403);
     }
   };
 
-  const logout = async (req, res) => {
-    req.session.destroy();
-    res.sendStatus(200);
-  };
-
   const getShortTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios
-        .get(
+      let response;
+      try {
+        response = await axios.get(
           "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=0",
           { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
-        )
-        .catch((error) => {
-          if (error.response.status === 401) {
-            refreshAuthToken(getShortTopSongs, req, res);
-          }
-        });
-      res.json(response.data.items);
+        );
+        res.json(response.data.items);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getShortTopSongs, req, res);
+        }
+      }
     } else {
       res.sendStatus(403);
     }
