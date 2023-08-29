@@ -100,6 +100,63 @@ const SpotifyController = (app) => {
     }
   };
 
+  const getShortTopArtists = async (req, res) => {
+    if (req.session.apiKey) {
+      let response;
+      try {
+        response = await axios.get(
+          "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=5&offset=0",
+          { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+        );
+        res.json(response.data.items);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getShortTopArtists, req, res);
+        }
+      }
+    } else {
+      res.sendStatus(403);
+    }
+  };
+
+  const getMediumTopArtists = async (req, res) => {
+    if (req.session.apiKey) {
+      let response;
+      try {
+        response = await axios.get(
+          "https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=5&offset=0",
+          { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+        );
+        res.json(response.data.items);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getMediumTopArtists, req, res);
+        }
+      }
+    } else {
+      res.sendStatus(403);
+    }
+  };
+
+  const getLongTopArtists = async (req, res) => {
+    if (req.session.apiKey) {
+      let response;
+      try {
+        response = await axios.get(
+          "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=5&offset=0",
+          { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
+        );
+        res.json(response.data.items);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getLongTopArtists, req, res);
+        }
+      }
+    } else {
+      res.sendStatus(403);
+    }
+  };
+
   const getShortTopSongs = async (req, res) => {
     if (req.session.apiKey) {
       let response;
@@ -121,17 +178,18 @@ const SpotifyController = (app) => {
 
   const getMediumTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios
-        .get(
+      let response;
+      try {
+        response = await axios.get(
           "https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=20&offset=0",
           { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
-        )
-        .catch((error) => {
-          if (error.response.status === 401) {
-            refreshAuthToken(getMediumTopSongs, req, res);
-          }
-        });
-      res.json(response.data.items);
+        );
+        res.json(response.data.items);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getMediumTopSongs, req, res);
+        }
+      }
     } else {
       res.sendStatus(403);
     }
@@ -139,17 +197,18 @@ const SpotifyController = (app) => {
 
   const getLongTopSongs = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios
-        .get(
+      let response;
+      try {
+        response = await axios.get(
           "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=0",
           { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
-        )
-        .catch((error) => {
-          if (error.response.status === 401) {
-            refreshAuthToken(getLongTopSongs, req, res);
-          }
-        });
-      res.json(response.data.items);
+        );
+        res.json(response.data.items);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getLongTopSongs, req, res);
+        }
+      }
     } else {
       res.sendStatus(403);
     }
@@ -228,6 +287,9 @@ const SpotifyController = (app) => {
   app.get("/spotify/callback", getApiKey);
   app.get("/spotify/profile", getProfile);
   app.post("/spotify/logout", logout);
+  app.get("/spotify/topartists/short", getShortTopArtists);
+  app.get("/spotify/topartists/medium", getMediumTopArtists);
+  app.get("/spotify/topartists/long", getLongTopArtists);
   app.get("/spotify/topsongs/short", getShortTopSongs);
   app.get("/spotify/topsongs/medium", getMediumTopSongs);
   app.get("/spotify/topsongs/long", getLongTopSongs);
