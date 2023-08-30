@@ -84,17 +84,17 @@ const SpotifyController = (app) => {
 
   const getProfile = async (req, res) => {
     if (req.session.apiKey) {
-      const response = await axios
-        .get("https://api.spotify.com/v1/me", {
+      let response;
+      try {
+        response = await axios.get("https://api.spotify.com/v1/me", {
           headers: { Authorization: `Bearer ${req.session.apiKey}` },
-        })
-        .catch((error) => {
-          if (error.response.status === 401) {
-            refreshAuthToken(getProfile, req, res);
-          }
         });
-      // res.sendStatus(403);
-      res.json(response.data);
+        res.json(response.data);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          refreshAuthToken(getProfile, req, res);
+        }
+      }
     } else {
       res.sendStatus(403);
     }
@@ -105,7 +105,7 @@ const SpotifyController = (app) => {
       let response;
       try {
         response = await axios.get(
-          "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=5&offset=0",
+          "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=10&offset=0",
           { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
         );
         res.json(response.data.items);
@@ -124,7 +124,7 @@ const SpotifyController = (app) => {
       let response;
       try {
         response = await axios.get(
-          "https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=5&offset=0",
+          "https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=10&offset=0",
           { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
         );
         res.json(response.data.items);
@@ -143,7 +143,7 @@ const SpotifyController = (app) => {
       let response;
       try {
         response = await axios.get(
-          "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=5&offset=0",
+          "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=10&offset=0",
           { headers: { Authorization: `Bearer ${req.session.apiKey}` } }
         );
         res.json(response.data.items);
