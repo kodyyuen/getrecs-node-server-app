@@ -7,8 +7,6 @@ import SongsController from "./songs/songs-controller.js";
 import SpotifyController from "./spotify/spotify-controller.js";
 import 'dotenv/config';
 
-// mongoose.connect('mongodb://localhost:27017/getrecs')
-//mongoose.connect('mongodb://127.0.0.1:27017/getrecs')
 mongoose.connect(`mongodb+srv://kody:${process.env.MONGODB_PASSWORD}@cluster0.nth6ltf.mongodb.net/getrecs`);
 
 const app = express();
@@ -29,4 +27,4 @@ UsersController(app)
 SongsController(app)
 SpotifyController(app)
 
-app.listen(4000)
+app.listen(process.env.PORT || 4000)
