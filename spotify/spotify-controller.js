@@ -81,6 +81,7 @@ const SpotifyController = (app) => {
     );
     req.session.apiKey = response.data.access_token;
     req.session.refresh_token = response.data.refresh_token;
+    console.log('api token: ' + req.session.apiKey)
     res.redirect(redirect_uri_front);
   };
 
