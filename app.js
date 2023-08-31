@@ -23,8 +23,8 @@ app.use(
 app.use(
   session({
     secret: "should be an environment variable",
-    resave: false,
-    saveUninitialized: true,
+    // resave: false,
+    // saveUninitialized: false,
     secure: false,
     maxAge: 24 * 60 * 60 * 1000,
     // cookie: { secure: false },
