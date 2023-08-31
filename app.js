@@ -27,13 +27,19 @@ app.use(
 );
 app.use(
   session({
-    secret: "should be an environment variable",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, sameSite: "none" },
+    // secret: "should be an environment variable",
+    // resave: false,
+    // saveUninitialized: false,
+    // cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, sameSite: "none" },
+    // store: new MemoryStore({
+    //   checkPeriod: 86400000,
+    // }),
+    cookie: { maxAge: 86400000 },
     store: new MemoryStore({
-      checkPeriod: 86400000,
+      checkPeriod: 86400000, // prune expired entries every 24h
     }),
+    resave: false,
+    secret: "keyboard cat",
   })
 );
 app.use(express.json());
