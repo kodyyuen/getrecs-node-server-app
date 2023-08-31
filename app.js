@@ -14,7 +14,10 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://dev--celebrated-begonia-8703fb.netlify.app/",
+    ],
   })
 );
 app.use(
