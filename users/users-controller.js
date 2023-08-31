@@ -69,7 +69,7 @@ const UsersController = (app) => {
     const updates = req.body;
     console.log("updateUser req.session._id: " + req.session._id);
     console.log(
-      "updateUser req.session.currentUser._id: " + req.session.currentUser._id
+      "updateUser req.session.currentUser: " + req.session.currentUser
     );
 
     if (req.session["currentUser"]) {
