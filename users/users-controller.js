@@ -60,6 +60,9 @@ const UsersController = (app) => {
 
   const updateUser = async (req, res) => {
     const updates = req.body;
+    console.log('req.session._id: ' + req.session._id);
+    console.log('req.session.currentUser._id: ' + req.session.currentUser._id);
+
     if (req.session['currentUser']) {
         const uid = req.session['currentUser']._id;
         const update = await usersDao.updateUser(uid, updates);
