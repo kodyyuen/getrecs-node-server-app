@@ -1,13 +1,14 @@
 import express from "express";
 import cors from "cors";
 // import session from "cookie-session";
-import session from "express-session";
+// import session from "express-session";
 import mongoose from "mongoose";
 import UsersController from "./users/users-controller.js";
 import SongsController from "./songs/songs-controller.js";
 import SpotifyController from "./spotify/spotify-controller.js";
 import "dotenv/config";
-const { MemoryStore } = session;
+const session = require("express-session");
+const MemoryStore = require("memorystore")(session);
 
 mongoose.connect(`${process.env.DB_CONNECTION_STRING}`);
 
