@@ -25,7 +25,7 @@ app.use(
     secret: "should be an environment variable",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: true },
   })
 );
 app.use(express.json());
