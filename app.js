@@ -29,7 +29,7 @@ app.use(
   session({
     secret: "should be an environment variable",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 },
     store: new MemoryStore({
       checkPeriod: 86400000,
