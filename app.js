@@ -16,7 +16,7 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:3000",
-      "https://dev--celebrated-begonia-8703fb.netlify.app/",
+      "https://dev--celebrated-begonia-8703fb.netlify.app",
     ],
   })
 );
