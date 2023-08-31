@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import session from "express-session";
+import session from "cookie-session";
 import mongoose from "mongoose";
 import UsersController from "./users/users-controller.js";
 import SongsController from "./songs/songs-controller.js";
@@ -26,7 +26,6 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false },
-    maxAge: 1000 * 60 * 60 * 48,
   })
 );
 app.use(express.json());
