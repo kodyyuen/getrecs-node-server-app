@@ -4,7 +4,7 @@ import querystring from "querystring";
 const SpotifyController = (app) => {
   // const redirect_uri_front = "http://localhost:3000/profile";
   // const redirect_uri = "http://localhost:4000/spotify/callback";
-  const redirect_uri_front = "https://dev--celebrated-begonia-8703fb.netlify.app/spotify";
+  const redirect_uri_front = "https://dev--celebrated-begonia-8703fb.netlify.app/login";
   const redirect_uri = "https://getrecs-node-server-app-6d8abdb70e6b.herokuapp.com/spotify/callback";
 
   const logout = async (req, res) => {
