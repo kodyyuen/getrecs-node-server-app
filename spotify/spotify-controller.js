@@ -86,6 +86,9 @@ const SpotifyController = (app) => {
   };
 
   const getProfile = async (req, res) => {
+    console.log('req.session: ' + req.session);
+    console.log('req.session.apiKey: ' + req.session.apiKey);
+
     if (req.session.apiKey) {
       let response;
       try {
