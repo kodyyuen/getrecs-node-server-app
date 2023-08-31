@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-// import session from "cookie-session";
 import session from "express-session";
 import mongoose from "mongoose";
 import UsersController from "./users/users-controller.js";
@@ -9,6 +8,13 @@ import SpotifyController from "./spotify/spotify-controller.js";
 import "dotenv/config";
 import createMemoryStore from "memorystore";
 const MemoryStore = createMemoryStore(session);
+import ConnectMongoDBSession from "connect-mongodb-session";
+
+const MongoDBStore = ConnectMongoDBSession(session);
+var store = new MongoDBStore({
+  uri: process.env.DB_CONNECTION_STRING,
+  collection: "sessions",
+});
 // const session = require("express-session");
 // const MemoryStore = require("memorystore")(session);
 
@@ -27,19 +33,18 @@ app.use(
 );
 app.use(
   session({
-    // secret: "should be an environment variable",
+    secret: "should be an environment variable",
     // resave: false,
     saveUninitialized: false,
     // cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, sameSite: "none" },
     // store: new MemoryStore({
     //   checkPeriod: 86400000,
     // }),
-    cookie: { maxAge: 86400000 },
-    store: new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    },
+    store: store,
     resave: false,
-    secret: "keyboard cat",
   })
 );
 app.use(express.json());
