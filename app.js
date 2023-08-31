@@ -30,7 +30,7 @@ app.use(
     secret: "should be an environment variable",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 },
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, sameSite: "none" },
     store: new MemoryStore({
       checkPeriod: 86400000,
     }),
