@@ -26,5 +26,6 @@ app.use(express.json())
 UsersController(app)
 SongsController(app)
 SpotifyController(app)
+app.get('/', (req, res) => { res.send('Hello from Express!')});
 
 app.listen(process.env.PORT || 4000)
