@@ -53,7 +53,7 @@ const SpotifyController = (app) => {
       redirect_uri: redirect_uri,
       show_dialog: "true",
     });
-
+    res.cookie();
     res.redirect("https://accounts.spotify.com/authorize?" + str);
   };
 
