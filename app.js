@@ -15,6 +15,11 @@ var store = new MongoDBStore({
   uri: process.env.DB_CONNECTION_STRING,
   collection: "sessions",
 });
+
+// Catch errors
+store.on("error", function (error) {
+  console.log(error);
+});
 // const session = require("express-session");
 // const MemoryStore = require("memorystore")(session);
 
@@ -22,6 +27,15 @@ mongoose.connect(`${process.env.DB_CONNECTION_STRING}`);
 
 const app = express();
 
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: [
+//       "http://localhost:3000",
+//       "https://dev--celebrated-begonia-8703fb.netlify.app",
+//     ],
+//   })
+// );
 app.use(
   cors({
     credentials: true,
@@ -29,27 +43,26 @@ app.use(
       "http://localhost:3000",
       "https://dev--celebrated-begonia-8703fb.netlify.app",
     ],
-  })
-);
-app.use(
+  }),
   session({
-    secret: "should be an environment variable",
+    secret: "thesecret",
     // resave: false,
     saveUninitialized: false,
     // cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, sameSite: "none" },
     // store: new MemoryStore({
     //   checkPeriod: 86400000,
     // }),
+    resave: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       sameSite: "none",
       secure: false,
     },
     store: store,
-    resave: false,
-  })
+  }),
+  express.json()
 );
-app.use(express.json());
+// app.use(express.json());
 
 UsersController(app);
 SongsController(app);
