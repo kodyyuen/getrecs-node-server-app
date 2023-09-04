@@ -58,7 +58,7 @@ app.use(
       sameSite: "none",
       secure: true,
     },
-    // store: store,
+    store: store,
     autoRemove: 'native'
   }),
   express.json()
