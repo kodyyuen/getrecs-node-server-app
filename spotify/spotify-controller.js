@@ -53,7 +53,7 @@ const SpotifyController = (app) => {
       redirect_uri: redirect_uri,
       show_dialog: "true",
     });
-    res.cookie();
+
     res.redirect("https://accounts.spotify.com/authorize?" + str);
   };
 
@@ -89,7 +89,7 @@ const SpotifyController = (app) => {
   const getProfile = async (req, res) => {
     console.log('req.session: ' + req.session);
     console.log('req.session.apiKey: ' + req.session.apiKey);
-    console.log('getProfile: ' + JSON.stringify(req.session, null, 2))
+    console.log('getApiKey: ' + JSON.stringify(req.session, null, 2))
 
     if (req.session.apiKey) {
       let response;
