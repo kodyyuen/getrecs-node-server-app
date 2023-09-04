@@ -59,10 +59,14 @@ app.use(
       secure: false,
     },
     store: store,
+    autoRemove: 'native'
   }),
   express.json()
 );
 // app.use(express.json());
+app.get('/', function(req, res) {
+  res.send('Hello ' + JSON.stringify(req.session));
+});
 
 UsersController(app);
 SongsController(app);
