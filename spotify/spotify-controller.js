@@ -59,6 +59,7 @@ const SpotifyController = (app) => {
 
   const getApiKey = async (req, res) => {
     let code = req.query.code;
+    console.log("code: " + code)
 
     const response = await axios.post(
       "https://accounts.spotify.com/api/token",
