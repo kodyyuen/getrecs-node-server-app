@@ -59,7 +59,6 @@ const SpotifyController = (app) => {
 
   const getApiKey = async (req, res) => {
     let code = req.query.code;
-    console.log("code: " + code)
 
     const response = await axios.post(
       "https://accounts.spotify.com/api/token",
@@ -82,16 +81,10 @@ const SpotifyController = (app) => {
     );
     req.session.apiKey = response.data.access_token;
     req.session.refresh_token = response.data.refresh_token;
-    console.log('api token: ' + req.session.apiKey);
-    console.log('getApiKey: ' + JSON.stringify(req.session, null, 2))
     res.redirect(redirect_uri_front);
   };
 
   const getProfile = async (req, res) => {
-    console.log('req.session: ' + req.session);
-    console.log('req.session.apiKey: ' + req.session.apiKey);
-    console.log('getApiKey: ' + JSON.stringify(req.session, null, 2))
-
     if (req.session.apiKey) {
       let response;
       try {

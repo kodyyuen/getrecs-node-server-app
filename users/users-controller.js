@@ -42,10 +42,6 @@ const UsersController = (app) => {
     );
     if (existingUser) {
       req.session["currentUser"] = existingUser;
-      console.log("login req.session._id: " + req.session._id);
-      console.log(
-        "login req.session.currentUser._id: " + req.session.currentUser._id
-      );
       res.json(existingUser);
       return;
     }
@@ -67,10 +63,6 @@ const UsersController = (app) => {
 
   const updateUser = async (req, res) => {
     const updates = req.body;
-    console.log("updateUser req.session._id: " + req.session._id);
-    console.log(
-      "updateUser req.session.currentUser: " + req.session.currentUser
-    );
 
     if (req.session["currentUser"]) {
       const uid = req.session["currentUser"]._id;
