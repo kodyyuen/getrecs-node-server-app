@@ -44,7 +44,7 @@ const SpotifyController = (app) => {
   };
 
   const redirectLogin = async (req, res) => {
-    const scopes = ["user-top-read", "playlist-modify-private", "playlist-read-private"];
+    const scopes = ["user-top-read", "playlist-modify-private", "playlist-read-private", "playlist-read-collaborative"];
 
     const str = querystring.stringify({
       response_type: "code",
